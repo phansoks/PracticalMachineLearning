@@ -53,9 +53,10 @@ up with smaller error rate. We also specify the number of repetition for the
 cross validation to 5.
 
 Due to high memory and cpu usage, we had to train our model on a partition of our 
-training set.
+training set. For this report, we put 33% as an example but we used a 80% partition
+for testing set prediction.
 
-```{r, cache=TRUE}
+```{r, eval=FALSE}
 library(doParallel)
 registerDoParallel(cores=2)
 library(caret)
@@ -69,12 +70,46 @@ modelFit<-train(classe~.,data=training[partition,],method="rf",
 ```
 
 ###Expected out of sample error
-```{r}
-print(modelFit)
-print(modelFit$finalModel)
-table(training$classe, predict(modelFit, newdata=training))
+```{r, eval=FALSE}
+> print(modelFit)
+
+Random Forest 
+
+6479 samples
+  53 predictor
+   5 classes: 'A', 'B', 'C', 'D', 'E' 
+
+No pre-processing
+Resampling: Cross-Validated (5 fold) 
+Summary of sample sizes: 5183, 5183, 5182, 5184, 5184 
+Resampling results across tuning parameters:
+
+  mtry  Accuracy   Kappa      Accuracy SD  Kappa SD   
+   2    0.9825597  0.9779336  0.002646090  0.003347122
+  27    0.9905849  0.9880888  0.002404419  0.003043996
+  53    0.9884252  0.9853567  0.003854517  0.004879990
+
+Accuracy was used to select the optimal model using  the largest value.
+The final value used for the model was mtry = 27. 
 ```
 
+Best accuracy selected for the model is 0.9905849, which mean expected out of sample 
+error is less than 1% (`r (100-99.05849)`% to be precise).
+
+Confusion matrix below confirms this error rates. Indeed, out of the 19622 activity 
+classes of the training set, 19512 were correctly predicted and 110 incorrectly 
+predicted. This corresponds to a `r 110/19622*100`% error rate.
+
+```{r, eval=FALSE}
+> table(training$classe, predict(modelFit, newdata=training))
+
+       A    B    C    D    E
+  A 5579    0    0    0    1
+  B   15 3758   24    0    0
+  C    0   13 3407    2    0
+  D    0    0   39 3177    0
+  E    0    3    0   13 3591
+```
 
 ##Conclusion
 Using caret package and data provided by the Groupware@LES, we manage to build a 

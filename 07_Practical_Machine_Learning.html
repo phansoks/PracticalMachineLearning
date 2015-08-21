@@ -98,13 +98,50 @@ testing&lt;-testing[,filled_data]</code></pre>
 <div id="cross-validation" class="section level3">
 <h3>Cross validation</h3>
 <p>As training method, using regressions would not have been a good idea as we want to classify between 6 non-numeric outcomes: A, B, C, D, E. Trying differents methods (trees, bagging, random forests and boosting ), it appears random forests ended up with smaller error rate. We also specify the number of repetition for the cross validation to 5.</p>
-<p>Due to high memory and cpu usage, we had to train our model on a partition of our training set.</p>
+<p>Due to high memory and cpu usage, we had to train our model on a partition of our training set. For this report, we put 33% as an example but we used a 80% partition for testing set prediction.</p>
+<pre class="r"><code>library(doParallel)
+registerDoParallel(cores=2)
+library(caret)
+library(AppliedPredictiveModeling)
+set.seed(123)
+
+partition &lt;-createDataPartition(y=training$classe,p=0.33,list=FALSE)
+modelFit&lt;-train(classe~.,data=training[partition,],method=&quot;rf&quot;,
+                trControl=trainControl(method=&quot;cv&quot;,number=5),
+                prox=TRUE,allowParallel=TRUE, model=FALSE)</code></pre>
 </div>
 <div id="expected-out-of-sample-error" class="section level3">
 <h3>Expected out of sample error</h3>
-<pre class="r"><code>print(modelFit)
-print(modelFit$finalModel)
-table(training$classe, predict(modelFit, newdata=training))</code></pre>
+<pre class="r"><code>&gt; print(modelFit)
+
+Random Forest 
+
+6479 samples
+  53 predictor
+   5 classes: 'A', 'B', 'C', 'D', 'E' 
+
+No pre-processing
+Resampling: Cross-Validated (5 fold) 
+Summary of sample sizes: 5183, 5183, 5182, 5184, 5184 
+Resampling results across tuning parameters:
+
+  mtry  Accuracy   Kappa      Accuracy SD  Kappa SD   
+   2    0.9825597  0.9779336  0.002646090  0.003347122
+  27    0.9905849  0.9880888  0.002404419  0.003043996
+  53    0.9884252  0.9853567  0.003854517  0.004879990
+
+Accuracy was used to select the optimal model using  the largest value.
+The final value used for the model was mtry = 27. </code></pre>
+<p>Best accuracy selected for the model is 0.9905849, which mean expected out of sample error is less than 1% (0.94151% to be precise).</p>
+<p>Confusion matrix below confirms this error rates. Indeed, out of the 19622 activity classes of the training set, 19512 were correctly predicted and 110 incorrectly predicted. This corresponds to a 0.5605953% error rate.</p>
+<pre class="r"><code>&gt; table(training$classe, predict(modelFit, newdata=training))
+
+       A    B    C    D    E
+  A 5579    0    0    0    1
+  B   15 3758   24    0    0
+  C    0   13 3407    2    0
+  D    0    0   39 3177    0
+  E    0    3    0   13 3591</code></pre>
 </div>
 </div>
 <div id="conclusion" class="section level2">
