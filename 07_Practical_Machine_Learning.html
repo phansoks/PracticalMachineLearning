@@ -75,8 +75,8 @@ img {
 
 <div id="overview" class="section level2">
 <h2>Overview</h2>
-<p>In this project, we will use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants, who were asked to perform barbell lifts correctly (classe ‘A’ in data set) and incorrectly in 5 different ways (classe ‘B’ to ‘E’). The data for this project come from the <a href="mailto:Groupware@LES">Groupware@LES</a> (<a href="http://groupware.les.inf.puc-rio.br/har" class="uri">http://groupware.les.inf.puc-rio.br/har</a>).</p>
-<p>Our goal is to build a machine learning algorithm, which predicts the classe, ie. if the participant lifted correctly the barbell or made one of the 5 mistakes.</p>
+<p>In this project, we will use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants, who were asked to perform barbell lifts correctly (classe ‘A’ in data set) and incorrectly in 4 different ways (classe ‘B’ to ‘E’). The data for this project come from the <a href="mailto:Groupware@LES">Groupware@LES</a> (<a href="http://groupware.les.inf.puc-rio.br/har" class="uri">http://groupware.les.inf.puc-rio.br/har</a>).</p>
+<p>Our goal is to build a machine learning algorithm, which predicts the classe, ie. if the participant lifted correctly the barbell or made one of the 4 mistakes.</p>
 <div id="exploratory-data-analysis" class="section level3">
 <h3>Exploratory Data Analysis</h3>
 <pre class="r"><code>training &lt;- read.csv(&quot;pml-training.csv&quot;, na.strings=c(&quot;NA&quot;,&quot;&quot;))
@@ -132,8 +132,8 @@ Resampling results across tuning parameters:
 
 Accuracy was used to select the optimal model using  the largest value.
 The final value used for the model was mtry = 27. </code></pre>
-<p>Best accuracy selected for the model is 0.9905849, which mean expected out of sample error is less than 1% (0.94151% to be precise).</p>
-<p>Confusion matrix below confirms this error rates. Indeed, out of the 19622 activity classes of the training set, 19512 were correctly predicted and 110 incorrectly predicted. This corresponds to a 0.5605953% error rate.</p>
+<p>Best accuracy selected for the model is 0.9905849, which means expected out of sample error is less than 1% (0.94151% to be precise).</p>
+<p>Confusion matrix below confirms this error rate. Indeed, out of the 19622 activity classes of the training set, 19512 were correctly predicted and 110 incorrectly predicted. This corresponds to a 0.5605953% error rate.</p>
 <pre class="r"><code>&gt; table(training$classe, predict(modelFit, newdata=training))
 
        A    B    C    D    E

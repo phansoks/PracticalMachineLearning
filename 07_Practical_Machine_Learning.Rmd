@@ -8,11 +8,11 @@ output: html_document
 ##Overview
 In this project, we will use data from accelerometers on the belt, forearm, arm, 
 and dumbell of 6 participants, who were asked to perform barbell lifts correctly 
-(classe 'A' in data set) and incorrectly in 5 different ways (classe 'B' to 'E'). 
+(classe 'A' in data set) and incorrectly in 4 different ways (classe 'B' to 'E'). 
 The data for this project come from the Groupware@LES (http://groupware.les.inf.puc-rio.br/har).
 
 Our goal is to build a machine learning algorithm, which predicts the classe, ie. 
-if the participant lifted correctly the barbell or made one of the 5 mistakes.
+if the participant lifted correctly the barbell or made one of the 4 mistakes.
 
 ###Exploratory Data Analysis
 ```{r, message=FALSE}
@@ -93,10 +93,10 @@ Accuracy was used to select the optimal model using  the largest value.
 The final value used for the model was mtry = 27. 
 ```
 
-Best accuracy selected for the model is 0.9905849, which mean expected out of sample 
+Best accuracy selected for the model is 0.9905849, which means expected out of sample 
 error is less than 1% (`r (100-99.05849)`% to be precise).
 
-Confusion matrix below confirms this error rates. Indeed, out of the 19622 activity 
+Confusion matrix below confirms this error rate. Indeed, out of the 19622 activity 
 classes of the training set, 19512 were correctly predicted and 110 incorrectly 
 predicted. This corresponds to a `r 110/19622*100`% error rate.
 
