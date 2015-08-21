@@ -1,0 +1,85 @@
+---
+title: "Machine Learning Algorithm to classify barbell lifting quality"
+author: "Sok PHAN, phansoks@gmail.com"
+date: "Friday, August 21, 2015"
+output: html_document
+---
+
+##Overview
+In this project, we will use data from accelerometers on the belt, forearm, arm, 
+and dumbell of 6 participants, who were asked to perform barbell lifts correctly 
+(classe 'A' in data set) and incorrectly in 5 different ways (classe 'B' to 'E'). 
+The data for this project come from the Groupware@LES (http://groupware.les.inf.puc-rio.br/har).
+
+Our goal is to build a machine learning algorithm, which predicts the classe, ie. 
+if the participant lifted correctly the barbell or made one of the 5 mistakes.
+
+###Exploratory Data Analysis
+```{r, message=FALSE}
+training <- read.csv("pml-training.csv", na.strings=c("NA",""))
+testing <- read.csv("pml-testing.csv", na.strings=c("NA",""))
+```
+
+After loading the data, we can notice that original training set has `r dim(training)[1]` 
+observations and 159 possible predictors. Doing a summary on training
+set, we clearly see many variables having empty/0/NA values. We will have to handle them.
+
+###Machine Learning Algorithm Creation
+First, we need to reduced the number of predictors because it would take an great 
+amount of time and to train a model based on 159 predictors. Having a look at first columns
+of data set, we decided to remove them as we consider they are not relevant information.
+
+Then, we also remove columns having less than 95% of observation filled. They correspond
+to calculated data such as std, variance, kurtosis, skewness, etc for one specific performed 
+activity. There are hundreds of them, so we think removing them will improve significantly
+our computation time without decreasing our predictions. 
+
+Finally, we have `r dim(training)[2] - 1` predictors in our model.
+
+```{r, message=FALSE}
+training <- subset(training, select = -c(X, user_name, raw_timestamp_part_1, raw_timestamp_part_2, cvtd_timestamp, new_window))
+testing <- subset(testing, select = -c(X, user_name, raw_timestamp_part_1, raw_timestamp_part_2, cvtd_timestamp, new_window))
+
+filled_data <- apply(!is.na(training),2,sum)/dim(training)[1] > 0.95
+training<-training[,filled_data]
+testing<-testing[,filled_data]
+```
+
+###Cross validation
+As training method, using regressions would not have been a good idea as we want
+to classify between 6 non-numeric outcomes: A, B, C, D, E. Trying differents methods
+(trees, bagging, random forests and boosting ), it appears random forests ended
+up with smaller error rate. We also specify the number of repetition for the 
+cross validation to 5.
+
+Due to high memory and cpu usage, we had to train our model on a partition of our 
+training set.
+
+```{r, cache=TRUE}
+library(doParallel)
+registerDoParallel(cores=2)
+library(caret)
+library(AppliedPredictiveModeling)
+set.seed(123)
+
+partition <-createDataPartition(y=training$classe,p=0.33,list=FALSE)
+modelFit<-train(classe~.,data=training[partition,],method="rf",
+                trControl=trainControl(method="cv",number=5),
+                prox=TRUE,allowParallel=TRUE, model=FALSE)
+```
+
+###Expected out of sample error
+```{r}
+print(modelFit)
+print(modelFit$finalModel)
+table(training$classe, predict(modelFit, newdata=training))
+```
+
+
+##Conclusion
+Using caret package and data provided by the Groupware@LES, we manage to build a 
+machine learning able to correclty evaluate barbell lifting quality based on a selected 
+set of `r dim(training)[2] - 1` predictors and the random forest method.
+
+Based on the error rate less than 1% on training set, we can say this is quiet a
+surprising result! On the testing set, it scored 100% correct results.
